@@ -13,10 +13,27 @@ An AI-powered stock analysis system built with LangGraph that combines fundament
 ## 🏗️ Architecture
 
 ```
-User Input → State Initializer → Fundamental Analyst
-                                      ↓
-                              Technical Analyst → Analyst Manager → Final Recommendation
+                    📥 User Input
+                         │
+                         ▼
+                🎯 State Initializer
+                   (Extract Ticker)
+                         │
+                    ┌────┴────┐
+                    ▼         ▼
+          📊 Fundamental   📈 Technical
+             Analyst        Analyst
+                    │         │
+                    └────┬────┘
+                         ▼
+                🧠 Analyst Manager
+                (Synthesize Reports)
+                         │
+                         ▼
+                📋 Final Recommendation
 ```
+
+![LangGraph Architecture](images/architecture-diagram.png)
 
 ### Components:
 - **State Initializer**: Extracts ticker symbols using LLM
