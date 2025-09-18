@@ -1,0 +1,11 @@
+langgraph
+langgraph-cli
+langgraph-prebuilt
+langchain-core
+langchain-community
+langchain-openai
+python-dotenv
+requests
+pandas
+stockstats
+

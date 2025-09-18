@@ -1,0 +1,14 @@
+{
+  "dockerfile_lines": [],
+  "graphs": {
+    "fundamental_agent": "./fundamental_agent.py:graph",
+    "technical_agent": "./technical_analyst.py:graph",
+    "agent_2": "./agent_2.py:graph",
+    "analyst_manager": "./analyst_manager.py:graph"
+  },
+  "env": "./.env",
+  "python_version": "3.11",
+  "dependencies": [
+    "."
+  ]
+}
