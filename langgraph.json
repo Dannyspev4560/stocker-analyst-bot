@@ -1,10 +1,10 @@
 {
   "dockerfile_lines": [],
   "graphs": {
-    "fundamental_agent": "./fundamental_agent.py:graph",
-    "technical_agent": "./technical_analyst.py:graph",
-    "agent_2": "./agent_2.py:graph",
-    "analyst_manager": "./analyst_manager.py:graph"
+    "fundamental_agent": "./analysts/fundamental_agent.py:graph",
+    "technical_agent": "./analysts/technical_analyst.py:graph",
+    "main_agent": "./setup.py:graph",
+    "agent_2": "./agent_2.py:graph"
   },
   "env": "./.env",
   "python_version": "3.11",

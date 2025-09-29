@@ -17,7 +17,6 @@ load_dotenv()
 model = ChatOpenAI(model="gpt-4o")
 
 
-
 # System message
 fundamental_analyst_sys_msg = SystemMessage(content="""You are a professional equity research analyst specializing in fundamental analysis.
 
@@ -25,7 +24,8 @@ fundamental_analyst_sys_msg = SystemMessage(content="""You are a professional eq
     - 2 years of annual financial statements (income, balance sheet, cash flow)
     - 2 quarters of recent quarterly data (income, balance sheet, cash flow, earnings)
     - Financial ratios, key metrics, and enterprise values (both annual and quarterly)
-    - Company profile (sector, industry, market cap, description)
+    
+    Note: Company profile data (sector, industry, market cap, description) is available through a separate tool if needed.
 
     Your role is to analyze this comprehensive dataset to assess the stock's investment potential.
 

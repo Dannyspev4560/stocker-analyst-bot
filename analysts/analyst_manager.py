@@ -2,43 +2,12 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
-from langgraph.graph import END, START, StateGraph, MessagesState
-from fundamental_agent import fundamental_analyst
-from technical_analyst import technical_analyst
 from analyst_states import AnalystManagerState
 
 # Load environment variables from .env file
 load_dotenv()
 
 llm = ChatOpenAI(model="gpt-4o")
-
-def state_initializer(state: MessagesState) -> AnalystManagerState:
-    """Extract ticker from the input message string"""
-    
-    # System message for ticker extraction
-    ticker_extraction_msg = SystemMessage(content="""You are a ticker extraction specialist. 
-    Your job is to extract the stock ticker symbol from user messages.
-    
-    Rules:
-    - Look for 2-5 letter uppercase stock symbols (e.g., AAPL, TSLA, GOOGL, MSFT)
-    - The ticker might be in phrases like "analyze AAPL", "TSLA stock", "look at GOOGL"
-    - Only return the ticker symbol itself, nothing else
-    - If you can't find a clear ticker, return "UNKNOWN"
-    
-    Examples:
-    - "analyze AAPL" → AAPL
-    - "I want to know about Tesla stock TSLA" → TSLA  
-    - "Can you analyze GOOGL for me?" → GOOGL
-    - "What about MSFT?" → MSFT
-    """)
-
-    response = llm.invoke([ticker_extraction_msg] + state["messages"])
-    
-    return {
-            "messages": [response],
-            "ticker": response.content
-           }
-
 
 
 def analyst_manager(state: AnalystManagerState):
@@ -106,24 +75,3 @@ def analyst_manager(state: AnalystManagerState):
     response = llm.invoke([sys_msg, HumanMessage(content=analysis_prompt)])
     
     return {"manager_analysis": response.content}
-
-
-
-builder = StateGraph(AnalystManagerState, input_schema=MessagesState)
-
-builder.add_node("state_initializer", state_initializer)
-builder.add_node("fundamental_analyst", fundamental_analyst)
-builder.add_node("technical_analyst", technical_analyst)
-builder.add_node("analyst_manager", analyst_manager)
-
-# Start with state initialization to extract ticker
-builder.add_edge(START, "state_initializer")
-# Then run fundamental analyst and technical analyst parallelly
-builder.add_edge("state_initializer", "fundamental_analyst")
-builder.add_edge("state_initializer", "technical_analyst")
-# Finally, combine results in analyst manager
-builder.add_edge("fundamental_analyst", "analyst_manager")
-builder.add_edge("technical_analyst", "analyst_manager")
-builder.add_edge("analyst_manager", END)
-
-graph = builder.compile()

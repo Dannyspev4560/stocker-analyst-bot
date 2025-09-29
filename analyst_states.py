@@ -19,7 +19,8 @@ class TechnicalAnalysisState(MessagesState):
 
 
 class AnalystManagerState(MessagesState):
-    ticker: str = ""
+    company_profile: str 
+    ticker: str 
     fundamental_analysis: str
     technical_analysis: str
     manager_analysis: str

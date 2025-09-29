@@ -144,21 +144,6 @@ def getFundamentalShortTermData(ticker: str) -> str:
         }
         return json.dumps(error_msg, indent=2)
 
-@tool
-def get_company_profile(ticker: str) -> str:
-    """Gets the company profile for a given ticker from Financial Modeling Prep API
-    """
-    api_key = os.getenv("FMP_API_KEY")
-    if not api_key:
-        return json.dumps({"error": "FMP_API_KEY not found in environment variables"})
-    
-    base_url = "https://financialmodelingprep.com/api/v3"
-    
-    company_profile = {
-        "company_profile": f"{base_url}/profile/{ticker}?apikey={api_key}"
-    }
-    
-    return json.dumps(company_profile, indent=2)
 
 
 
@@ -166,14 +151,14 @@ def get_company_profile(ticker: str) -> str:
 def get_fundamental_data(ticker: str) -> str:
     """Gets both yearly and quarterly fundamental data for the last two years and two quarters from Financial Modeling Prep API
     
-    This function calls common endpoints once and combines unique data from both long-term and short-term functions
-    to avoid API call duplication.
+    This function combines unique data from both long-term and short-term functions. 
+    Company profile data is handled separately by the get_company_profile tool.
     
     Args:
         ticker: the ticker to get fundamental data for
     
     Returns:
-        JSON string containing comprehensive financial data (yearly + quarterly + common data)
+        JSON string containing comprehensive financial data (yearly + quarterly data only)
     """
     api_key = os.getenv("FMP_API_KEY")
     if not api_key:
@@ -184,23 +169,7 @@ def get_fundamental_data(ticker: str) -> str:
     
 
     try:
-        # Get common data that doesn't need to be duplicated
-        common_endpoints = {
-            "company_profile": f"{base_url}/profile/{ticker}?apikey={api_key}",
-        }
-        
         combined_data = {}
-        
-        # Fetch common data
-        for data_type, url in common_endpoints.items():
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            data = response.json()
-            if data:
-                combined_data[data_type] = data
-            else:
-                combined_data[data_type] = f"No {data_type} data available for {ticker}"
         
         # Get unique long-term data
         long_term_data = getFundamentalLongTermData(ticker)
@@ -220,7 +189,7 @@ def get_fundamental_data(ticker: str) -> str:
         # Add metadata
         combined_data["ticker"] = ticker.upper()
         combined_data["data_source"] = "Financial Modeling Prep"
-        combined_data["data_type"] = "Comprehensive (Annual + Quarterly + Common)"
+        combined_data["data_type"] = "Comprehensive (Annual + Quarterly)"
         
         return json.dumps(combined_data, indent=2)
         
