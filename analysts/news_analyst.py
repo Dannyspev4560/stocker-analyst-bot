@@ -52,6 +52,12 @@ def news_analyst_manager(state: MessagesState):
 
     return {"messages": [response]}
 
+def news_analyst_condition(state: MessagesState) -> str:
+    route = tools_condition(state)
+    if route == "tools":
+        return "tools"
+    return "default"
+
 
 llm = ChatOpenAI(model="gpt-4o")
 tools = [tavily_news_search_tool]
@@ -64,8 +70,8 @@ builder.add_node("tools", ToolNode(tools))
 builder.add_edge(START, "news_analyst")
 builder.add_conditional_edges(
     "news_analyst",
-   tools_condition,
-   path_map={"tools": "tools","__end__": "news_analyst_manager"}
+   news_analyst_condition,
+   path_map={"tools": "tools","default": "news_analyst_manager"}
 )
 builder.add_edge("tools", "news_analyst")
 builder.add_edge("news_analyst_manager", END)
