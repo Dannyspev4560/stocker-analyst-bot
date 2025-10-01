@@ -8,4 +8,5 @@ python-dotenv
 requests
 pandas
 stockstats
-
+beautifulsoup4
+duckduckgo-search

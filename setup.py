@@ -47,7 +47,7 @@ def ticker_extractor(state: MessagesState) -> AnalystManagerState:
             "ticker": ticker
            }
 
-
+# TODO: in case of no ticker but the rest of the analysts data is available route it to a simple node that explains the data
 def ticker_condition(state: AnalystManagerState) -> str:
         return "has_ticker" if state["ticker"] else "no_ticker"
 

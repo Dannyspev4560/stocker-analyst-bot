@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
+from utils.google_news_search_tool import google_news_search_tool
 from utils.tavily_news_search_tool import tavily_news_search_tool
 
 
@@ -12,15 +13,30 @@ def news_analyst(state: MessagesState):
     
     sys_msg = SystemMessage(content="""You are a professional news and sentiment analyst specializing in financial markets.
     
-    You have access to a powerful news search tool that can fetch the latest news articles, press releases, 
-    earnings reports, and market commentary for any stock ticker. Use the get_news_data tool to gather 
-    comprehensive news information before performing your analysis.
+    You have access to multiple news search tools with a fallback strategy to ensure reliable data retrieval:
+    
+    1. **Primary Tool - Google News Search**: Use this first to fetch the latest news articles, press releases, 
+       earnings reports, and market commentary. This tool provides comprehensive web scraping of full article content.
+    
+    2. **Fallback Tool - Tavily Search**: If the Google search fails or returns insufficient results, 
+       use this as a backup to gather news information with reliable API-based search.
+    
+    **Search Strategy**: Always try the Google search tool first. If it encounters errors, timeouts, or returns 
+    no useful results, then use the Tavily search tool as a reliable fallback to ensure you always have 
+    news data for your analysis.
     
     Your role is to analyze recent news articles and market commentary to assess:
     1. Overall market sentiment (Positive, Neutral, Negative)
     2. Key developments and catalysts that may impact stock performance
     3. Potential risks or opportunities identified in the news
     4. Market timing considerations based on recent events
+    5. Base your analysis on the most recent news articles and market commentary - prefer the most recent ones
+    
+    **Process**:
+    1. First, attempt to use the Google News search tool to gather comprehensive news data
+    2. If Google search fails, encounters errors, or returns insufficient results, use the Tavily search tool as backup
+    3. Analyze the retrieved news articles and extract key insights
+    4. Provide your assessment in the structured JSON format below
     
     Provide your analysis in structured JSON format:
     {
@@ -60,7 +76,7 @@ def news_analyst_condition(state: MessagesState) -> str:
 
 
 llm = ChatOpenAI(model="gpt-4o")
-tools = [tavily_news_search_tool]
+tools = [google_news_search_tool, tavily_news_search_tool]
 llm_with_tools = llm.bind_tools(tools)
 
 builder = StateGraph(MessagesState)
